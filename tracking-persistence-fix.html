@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tracking Persistence Issue - ShoppingGives Checkout UI Extension</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .container {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1, h2, h3 {
+            color: #2c3e50;
+        }
+        .timeline {
+            border-left: 2px solid #3498db;
+            padding-left: 20px;
+            margin: 20px 0;
+        }
+        .timeline-item {
+            margin-bottom: 20px;
+        }
+        .date {
+            color: #7f8c8d;
+            font-weight: 600;
+        }
+        pre {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        code {
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', monospace;
+            font-size: 14px;
+        }
+        .warning {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        .solution {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        .commit {
+            background: #e8f4f8;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 5px 0;
+        }
+        .impact {
+            background: #f8d7da;
+            border-left: 4px solid #dc3545;
+            padding: 15px;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Tracking Persistence Issue in Checkout UI Extension</h1>
+
+        <h2>Issue Summary</h2>
+        <p>The checkout UI extension is using an outdated version of the impact-sdk that lacks critical tracking persistence functionality. This causes tracking data loss and inability to verify donation completions throughout the customer journey.</p>
+
+        <div class="impact">
+            <h3>Current Impact</h3>
+            <ul>
+                <li>Unable to track full customer journey through checkout</li>
+                <li>Can't verify if donations are being properly completed</li>
+                <li>Post-purchase sharing features effectiveness cannot be measured</li>
+                <li>Tracking data is lost between page reloads</li>
+            </ul>
+        </div>
+
+        <h2>Timeline of Events</h2>
+        <div class="timeline">
+            <div class="timeline-item">
+                <div class="date">February 5th, 2025</div>
+                <p>Cesar De Casas publishes critical tracking updates in impact-sdk v0.3.20</p>
+                <div class="commit">
+                    Commit: <a href="https://github.com/NicheInteractiveMedia/shoppinggives.widget-sdk/commit/f216b6631b19306ae70a3005996df5f133405a24">f216b66</a>
+                    <pre><code>// Added session storage for tracking persistence
+if (!trackingId && sessionStorage) {
+    const regularTrackingNormalized = sessionStorage.getItem(
+        `sg.sid-${this.storeId.replace(/-/g, '')}`
+    );
+    if (regularTrackingNormalized) {
+        trackingId = atob(regularTrackingNormalized);
+    }
+}</code></pre>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="date">February 10th-11th, 2025</div>
+                <p>Stefan Vermaas implements vendored SDK in checkout UI extension</p>
+                <ol>
+                    <li>
+                        <div class="commit">
+                            <a href="https://github.com/NicheInteractiveMedia/ChangeCommerce.ShopifyAppExt/commit/eb36339a388c0161a749d8440be33f46b9f26ff9">eb36339</a> - Initial vendor SDK addition
+                        </div>
+                    </li>
+                    <li>
+                        <div class="commit">
+                            <a href="https://github.com/NicheInteractiveMedia/ChangeCommerce.ShopifyAppExt/commit/61dca9345f6baac6f115edb8298d59c66b6bff1b">61dca93</a> - Format vendored SDK
+                        </div>
+                    </li>
+                    <li>
+                        <div class="commit">
+                            <a href="https://github.com/NicheInteractiveMedia/ChangeCommerce.ShopifyAppExt/commit/1200f2315725591dff2ae81de8102013b07e9f7f">1200f23</a> - Use vendored SDK
+                        </div>
+                    </li>
+                    <li>
+                        <div class="commit">
+                            <a href="https://github.com/NicheInteractiveMedia/ChangeCommerce.ShopifyAppExt/commit/79a25d7c3318e46c775bf123ccb41af6dc921288">79a25d7</a> - Merge to master
+                        </div>
+                    </li>
+                </ol>
+            </div>
+        </div>
+
+        <h2>Required Changes</h2>
+        
+        <h3>1. Update Vendored SDK</h3>
+        <div class="solution">
+            <p>Replace the current vendored SDK with version 0.3.20</p>
+            <pre><code>// package.json
+{
+    "dependencies": {
+        "@shoppinggivesos/impact-sdk": "^0.3.20"
+    }
+}</code></pre>
+        </div>
+
+        <h3>2. Update SDK Initialization</h3>
+        <div class="solution">
+            <p>Modify the checkout UI extension initialization to handle session storage:</p>
+            <pre><code>// checkout-ui-extension/src/index.tsx
+const initializeTracking = async () => {
+    let trackingId = currentTrackingId;
+    
+    if (!trackingId && sessionStorage) {
+        const normalizedId = sessionStorage.getItem(
+            `sg.sid-${storeId.replace(/-/g, '')}`
+        );
+        if (normalizedId) {
+            trackingId = atob(normalizedId);
+        }
+    }
+
+    const config = {
+        storeId,
+        trackingId,
+        baseUrl: `https://clickstream.${environment}.shoppinggives.com`,
+        metadata: {
+            widget: {
+                type: 'StoreDonation',
+                style: 'Default',
+                placement: 'Checkout Ext',
+                location: 'Checkout'
+            }
+        }
+    };
+
+    return new EventTracker(config);
+};</code></pre>
+        </div>
+
+        <h3>3. Add Error Handling</h3>
+        <div class="solution">
+            <pre><code>const initializeTracking = async () => {
+    try {
+        // Previous initialization code...
+    } catch (error) {
+        if (error instanceof DOMException && error.name === 'SecurityError') {
+            console.warn('Session storage access denied in iframe context');
+            // Fallback to non-persistent tracking
+            return new EventTracker(basicConfig);
+        }
+        
+        if (error instanceof Base64DecodeError) {
+            console.error('Invalid tracking ID format in session storage');
+            sessionStorage.removeItem(`sg.sid-${storeId.replace(/-/g, '')}`);
+            return new EventTracker(basicConfig);
+        }
+
+        throw error;
+    }
+};</code></pre>
+        </div>
+
+        <h3>4. Environment Detection</h3>
+        <div class="solution">
+            <pre><code>// utils/getEnv.ts
+export const getEnvironment = (id: string): Environment => {
+    switch (id) {
+        case '33716895745':
+            return Environment.Staging;
+        case '33716895746':
+            return Environment.QA;
+        case '33716895747':
+            return Environment.Dev;
+        default:
+            return Environment.Production;
+    }
+};</code></pre>
+        </div>
+
+        <h2>Testing Checklist</h2>
+        <ul>
+            <li>✓ Verify tracking persists across page reloads</li>
+            <li>✓ Confirm tracking works in all environments (dev, staging, prod)</li>
+            <li>✓ Test donation completion tracking</li>
+            <li>✓ Validate post-purchase sharing analytics</li>
+            <li>✓ Check error handling in iframe contexts</li>
+            <li>✓ Verify Base64 encoding/decoding of tracking IDs</li>
+        </ul>
+
+        <div class="warning">
+            <h3>Important Notes</h3>
+            <ul>
+                <li>Backup the current vendored SDK before making changes</li>
+                <li>Deploy changes in stages, starting with dev environment</li>
+                <li>Monitor tracking analytics after deployment</li>
+                <li>Consider adding logging for tracking initialization failures</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>
