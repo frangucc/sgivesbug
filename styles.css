@@ -1,3 +1,47 @@
+.executive-summary {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 25px;
+    margin-bottom: 40px;
+    border: 1px solid #dee2e6;
+}
+
+.executive-summary h2 {
+    color: #2c3e50;
+    margin-top: 0;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #3498db;
+}
+
+.summary-section {
+    margin: 20px 0;
+}
+
+.summary-section h3 {
+    color: #2c3e50;
+    margin-bottom: 15px;
+}
+
+.summary-timeline {
+    padding-left: 20px;
+    border-left: 2px solid #3498db;
+}
+
+.summary-date {
+    font-weight: 600;
+    color: #2c3e50;
+    margin: 15px 0 10px;
+}
+
+.summary-timeline ul {
+    margin: 10px 0 20px;
+}
+
+.summary-timeline li.nested {
+    margin-left: 20px;
+    list-style-type: circle;
+}
+
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
     line-height: 1.6;

@@ -10,6 +10,54 @@
     <div class="container">
         <h1>Tracking Persistence Issue in Checkout UI Extension</h1>
 
+        <div class="executive-summary">
+            <h2>Executive Summary: SG NPM Package Update – Vendoring Conflict</h2>
+            
+            <div class="summary-section">
+                <h3>Issue Overview</h3>
+                <p>A version conflict between the vendored SDK and the latest NPM package caused tracking issues due to missing session storage recovery features.</p>
+            </div>
+
+            <div class="summary-section">
+                <h3>Timeline Recap</h3>
+                <div class="summary-timeline">
+                    <div class="summary-date">February 5, 2025:</div>
+                    <ul>
+                        <li>Cesar De Casas committed SDK version 0.3.20 (<a href="https://github.com/NicheInteractiveMedia/shoppinggives.widget-sdk/commit/f216b6631b19306ae70a3005996df5f133405a24">f216b66</a>)</li>
+                        <li>Added session storage tracking ID recovery</li>
+                        <li>Published SDK 0.3.20 to <a href="https://www.npmjs.com/package/@shoppinggivesos/impact-sdk">NPM registry</a></li>
+                    </ul>
+
+                    <div class="summary-date">February 10-11, 2025:</div>
+                    <ul>
+                        <li>Stefan Vermaas committed vendoring updates using an older SDK version:</li>
+                        <li class="nested"><a href="https://github.com/NicheInteractiveMedia/ChangeCommerce.ShopifyAppExt/commit/1200f2315725591dff2ae81de8102013b07e9f7f">1200f23</a>: Used vendored JS SDK</li>
+                        <li class="nested"><a href="https://github.com/NicheInteractiveMedia/ChangeCommerce.ShopifyAppExt/commit/61dca9345f6baac6f115edb8298d59c66b6bff1b">61dca93</a>: Formatted vendored SDK</li>
+                        <li class="nested"><a href="https://github.com/NicheInteractiveMedia/ChangeCommerce.ShopifyAppExt/commit/eb36339a388c0161a749d8440be33f46b9f26ff9">eb36339</a>: Integrated vendored SDK into checkout UI extension</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="summary-section">
+                <h3>What Happened</h3>
+                <ul>
+                    <li>Stefan vendored the SDK based on an older version (likely 0.3.12 or 0.3.15), missing Cesar's tracking ID recovery from version 0.3.20</li>
+                    <li>The vendored version did not include session storage recovery logic, causing tracking persistence issues</li>
+                    <li>The npm registry showed version 0.3.20 published 12 days ago, but Stefan's vendoring (7 days ago) used a version predating Cesar's update</li>
+                </ul>
+            </div>
+
+            <div class="summary-section">
+                <h3>Key Impact</h3>
+                <ul>
+                    <li>Missing session storage recovery for tracking IDs</li>
+                    <li>Potential loss of tracking data across sessions, impacting customer journey insights</li>
+                    <li>This versioning conflict stems from Stefan working with an older SDK version before Cesar's update reached the repository or npm install phase</li>
+                </ul>
+            </div>
+        </div>
+
+
         <h2>Issue Summary</h2>
         <p>The checkout UI extension is using an outdated version of the impact-sdk that lacks critical tracking persistence functionality. This causes tracking data loss and inability to verify donation completions throughout the customer journey.</p>
 
